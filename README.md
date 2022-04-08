@@ -12,4 +12,4 @@ If you are querying for timeouts (ex. orginal QS is timeout.objects.all() or sim
 # Things still being worked on
 
 - I have not finished the integration or unit tests yet.
-- The program "and chains" all filters. I'm working on reading the linkOperator. 
+- Program needs performance update. There was a lot of slowdown on my last addition.
