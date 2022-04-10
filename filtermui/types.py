@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import TypedDict
 
+
 class QuerySetOperations:
     FILTER = 0
     EXCLUDE = 1

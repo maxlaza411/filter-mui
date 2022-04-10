@@ -20,7 +20,11 @@ class QuerySetFaker:
     def filter(self: _QS, *args: Any, **kwargs: Any) -> _QS:
         self.called_functions.append({"type": "filter", "args": args, "kwargs": kwargs})
 
+        return self
+
     def exclude(self: _QS, *args: Any, **kwargs: Any) -> _QS:
         self.called_functions.append(
             {"type": "exclude", "args": args, "kwargs": kwargs}
         )
+
+        return self
