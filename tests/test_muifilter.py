@@ -1,12 +1,12 @@
-from .QuerySetFaker import QuerySetFaker
-from ..filtermui import add_mui_filters
-from .data import (
+from tests import (
+    QuerySetFaker,
     json_string_two,
     json_string_one,
     json_string_three,
     json_string_four,
     json_string_five,
 )
+from src.filtermui import add_mui_filters
 
 import unittest
 
@@ -14,7 +14,7 @@ import unittest
 class TestFilterMUI(unittest.TestCase):
     def test_example_one(self):
         faker = QuerySetFaker()
-        add_mui_filters(faker, json_string_one)
+        add_mui_filters(faker, json_string_one, {"MRN": "medical_record_number"})
         self.assertEqual(
             [
                 {
@@ -41,7 +41,8 @@ class TestFilterMUI(unittest.TestCase):
         faker = QuerySetFaker()
         add_mui_filters(faker, json_string_two)
         self.assertEqual(
-            "[{'type': 'filter', 'args': (<Q: (OR: ('first_name__iendswith', 'd'), ('indication_for_drug__isnull', True))>,), 'kwargs': {}}]",
+            "[{'type': 'filter', 'args': (<Q: (OR: ('first_name__iendswith', 'd'), ('indication_for_drug__isnull', "
+            "True))>,), 'kwargs': {}}]",
             str(faker.called_functions),
         )
 
@@ -89,11 +90,7 @@ class TestFilterMUI(unittest.TestCase):
         )
 
 
-# TODO: Possible Speedup here.
-# query = '{ "items": [ { "id": 1, "columnField": "timeoutCompleted", "operatorValue": "is", "value": true }, { "columnField": "status", "id": 3467, "operatorValue": "contains" } ], "linkOperator": "or" }'
-# faker = QuerySetFaker()
-# qs = add_mui_filters(faker, query)
-# faker.called_functions
-# [{'type': 'filter',
-#   'args': (<Q: (AND: ('timeout_completed__iexact', True))>,),
-#   'kwargs': {}}]
+# TODO: Possible Speedup here. query = '{ "items": [ { "id": 1, "columnField": "timeoutCompleted", "operatorValue":
+#  "is", "value": true }, { "columnField": "status", "id": 3467, "operatorValue": "contains" } ], "linkOperator":
+#  "or" }' faker = QuerySetFaker() qs = add_mui_filters(faker, query) faker.called_functions [{'type': 'filter',
+#  'args': (<Q: (AND: ('timeout_completed__iexact', True))>,), 'kwargs': {}}]
