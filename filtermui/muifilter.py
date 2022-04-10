@@ -3,6 +3,8 @@ from django.db.models.query import QuerySet
 from .utils import operators
 from .types import QuerySetOperations
 
+
+import datetime
 from django.db.models import Q
 import json
 import re
@@ -21,45 +23,34 @@ def add_mui_filters(
     using_or_linker = link_operator == "or" and len(filters) > 1
 
     if using_or_linker:
-        query_set = add_mui_filters_or_linker(query_set, filters, column_field_mappings)
+        q_objects = Q()
+        for filter in filters:
+            dict_filter, query_set_operation = read_filter(filter, column_field_mappings)
+            if dict_filter is None:
+                continue
+
+            if query_set_operation == QuerySetOperations.FILTER:
+                q_objects |= Q(**dict_filter)
+            else:
+                q_objects |= ~Q(**dict_filter)
+
+        query_set = query_set.filter(q_objects)
     else:
-        query_set = add_mui_filters_and_linker(query_set, filters, column_field_mappings)
-
-    return query_set
-
-
-def add_mui_filters_or_linker(query_set: QuerySet, filters: List, column_field_mappings: Dict[str, str] | None) -> QuerySet:
-    q_objects = Q()
-    for filter in filters:
-        dict_filter, query_set_operation = read_filter(filter, column_field_mappings)
-        if dict_filter is None:
-            continue
-
-        if query_set_operation == QuerySetOperations.FILTER:
-            q_objects |= Q(**dict_filter)
-        else:
-            q_objects |= ~Q(**dict_filter)
-
-    query_set = query_set.filter(q_objects)
-
-    return query_set
-
-    
-def add_mui_filters_and_linker(query_set: QuerySet, filters: List, column_field_mappings: Dict[str, str] | None) -> QuerySet:
-    for filter in filters:
-        dict_filter, query_set_operation = read_filter(filter, column_field_mappings)
-        if dict_filter is None:
-            continue
-                    
-        if query_set_operation == QuerySetOperations.FILTER:
-            query_set = query_set.filter(**dict_filter)
-        else:
-            query_set = query_set.exclude(**dict_filter)   
+        for filter in filters:
+            dict_filter, query_set_operation = read_filter(filter, column_field_mappings)
+            if dict_filter is None:
+                continue
+                        
+            if query_set_operation == QuerySetOperations.FILTER:
+                query_set = query_set.filter(**dict_filter)
+            else:
+                query_set = query_set.exclude(**dict_filter) 
 
     return query_set
 
 
 def read_filter(dict_filter: Dict, column_field_mappings: Dict[str, str] | None) -> tuple[dict[str, Any], QuerySetOperations]:
+    start_time = datetime.datetime.now()
     column_name: str = dict_filter["columnField"]
     mui_operator: str = dict_filter["operatorValue"]
     value: str = dict_filter.get("value", None)
