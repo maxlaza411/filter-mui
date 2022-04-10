@@ -25,7 +25,11 @@ from filtermui import add_mui_filters
 def patient_table_query(filter):
   patients = patient.objects.all()
   
-  patients = add_mui_filters(patients, filter, {"MRN": "medical_record_number", "placeOfBirth": "__place_of_birth__name"})
+  patients = add_mui_filters(
+    patients,
+    filter,
+    {"MRN": "medical_record_number", "placeOfBirth": "__place_of_birth__name"},
+  ) 
   
   return patients # This returns a QuerySet - you will often encode this into JSON. 
   
