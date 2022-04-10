@@ -25,6 +25,7 @@ def patient_table_query(filter):
 
 Note how in the mappings placeOfBirth is in camelCase. This is becuase it's submitted in cammel case and it is more efficent not to convert it if you are providing a mapping. It uses __ in place of birth becuase it is a diffrent table - we must specify when we traverse tables.
 
-# Things still being worked on
+# Active Areas of Improvment
 
-- Performance updates
+- Performance
+- Documentation
