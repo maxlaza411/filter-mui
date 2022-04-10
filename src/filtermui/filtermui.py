@@ -1,10 +1,9 @@
 from typing import Any, Dict, List
 from django.db.models.query import QuerySet
-from .utils import operators
-from .types import QuerySetOperations
+from .django_filter_operators import operators
+from .filter_types import QuerySetOperations
 
 
-import datetime
 from django.db.models import Q
 import json
 import re
@@ -56,7 +55,7 @@ def add_mui_filters(
 
 def read_filter(
     dict_filter: Dict, column_field_mappings: Dict[str, str] | None
-) -> tuple[dict[str, Any], QuerySetOperations]:
+) -> tuple[dict[str, Any], QuerySetOperations] | tuple[None, QuerySetOperations]:
     column_name: str = dict_filter["columnField"]
     mui_operator: str = dict_filter["operatorValue"]
     value: str = dict_filter.get("value", None)

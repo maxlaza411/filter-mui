@@ -1,5 +1,4 @@
-from typing import Dict
-from .types import QuerySetOperations, OperatorType
+from .filter_types import QuerySetOperations, OperatorType
 
 # Note that case does not matter.
 operators: OperatorType = {
