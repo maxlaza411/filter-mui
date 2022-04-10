@@ -8,13 +8,13 @@ Submit your MUI filters to your Django backend via a JSON String. Create a query
 
 # Example
 
-The following example allows the user to filter a MUI DataGrid displaying the following data of a patient model with the attributes medical_record_number (stored as MRN on front-end), first_name, last_name, date_of_birth, and place_of_birth (ForeignKey):
+The following example allows the user to filter a MUI DataGrid displaying the following data of a patient model with the attributes medical_record_number (stored as "MRN" on front-end), first_name, last_name, date_of_birth, and place_of_birth (ForeignKey):
 
 ```python
 from filtermui import add_mui_filters
 
 # Made up function called when user submits new query.
-def patient_table_query(filter)
+def patient_table_query(filter):
   patients = patient.objects.all()
   
   patients = add_mui_filters(patients, filter, {"MRN": "medical_record_number", "placeOfBirth": "__place_of_birth__name"})
