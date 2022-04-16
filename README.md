@@ -1,6 +1,6 @@
 # filter-mui
 
-This program converts MUI DataGrid filters into Django queries. 
+This program converts MUI DataGrid filters into Django queries. It is integrated with Django Channels.
 
 # How to Use
 
