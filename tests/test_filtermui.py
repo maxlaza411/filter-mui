@@ -11,10 +11,10 @@ from src.filtermui import add_mui_filters
 import unittest
 
 
-class TestFilterMUI(unittest.TestCase):
-    def test_example_one(self):
+class TestFilterMUI(unittest.IsolatedAsyncioTestCase):
+    async def test_example_one(self):
         faker = QuerySetFaker()
-        add_mui_filters(faker, json_string_one, {"MRN": "medical_record_number"})
+        await add_mui_filters(faker, json_string_one, {"MRN": "medical_record_number"})
         self.assertEqual(
             [
                 {
@@ -36,19 +36,19 @@ class TestFilterMUI(unittest.TestCase):
             faker.called_functions,
         )
 
-    def test_example_two(self):
+    async def test_example_two(self):
         # w/o and/or prompt
         faker = QuerySetFaker()
-        add_mui_filters(faker, json_string_two)
+        await add_mui_filters(faker, json_string_two)
         self.assertEqual(
             "[{'type': 'filter', 'args': (<Q: (OR: ('first_name__iendswith', 'd'), ('indication_for_drug__isnull', "
             "True))>,), 'kwargs': {}}]",
             str(faker.called_functions),
         )
 
-    def test_example_three(self):
+    async def test_example_three(self):
         faker = QuerySetFaker()
-        add_mui_filters(faker, json_string_three)
+        await add_mui_filters(faker, json_string_three)
         self.assertEqual(
             [
                 {
@@ -61,9 +61,9 @@ class TestFilterMUI(unittest.TestCase):
             faker.called_functions,
         )
 
-    def test_example_four(self):
+    async def test_example_four(self):
         faker = QuerySetFaker()
-        add_mui_filters(faker, json_string_four, {"Bob": "Bob"})
+        await add_mui_filters(faker, json_string_four, {"Bob": "Bob"})
         self.assertEqual(
             [
                 {
@@ -75,9 +75,9 @@ class TestFilterMUI(unittest.TestCase):
             faker.called_functions,
         )
 
-    def test_example_five(self):
+    async def test_example_five(self):
         faker = QuerySetFaker()
-        add_mui_filters(faker, json_string_five)
+        await add_mui_filters(faker, json_string_five)
         self.assertEqual(
             [
                 {
