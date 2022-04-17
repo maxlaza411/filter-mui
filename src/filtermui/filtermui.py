@@ -1,12 +1,12 @@
-from typing import Any, Dict, List
-from django.db.models.query import QuerySet
-from .django_filter_operators import operators
-from .filter_types import QuerySetOperations
-
-
-from django.db.models import Q
 import json
 import re
+from typing import Any, Dict, List
+
+from django.db.models import Q
+from django.db.models.query import QuerySet
+
+from .django_filter_operators import operators
+from .filter_types import QuerySetOperations
 
 
 def add_mui_filters(

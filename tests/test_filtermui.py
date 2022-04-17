@@ -1,14 +1,8 @@
-from tests import (
-    QuerySetFaker,
-    json_string_one,
-    json_string_two,
-    json_string_three,
-    json_string_four,
-    json_string_five,
-)
-from src.filtermui import add_mui_filters
-
 import unittest
+
+from src.filtermui import add_mui_filters
+from tests import (QuerySetFaker, json_string_five, json_string_four,
+                   json_string_one, json_string_three, json_string_two)
 
 
 class TestFilterMUI(unittest.TestCase):

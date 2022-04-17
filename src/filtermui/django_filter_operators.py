@@ -1,4 +1,4 @@
-from .filter_types import QuerySetOperations, OperatorType
+from .filter_types import OperatorType, QuerySetOperations
 
 # Note that case does not matter.
 operators: OperatorType = {
