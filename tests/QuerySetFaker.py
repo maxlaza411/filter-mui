@@ -2,10 +2,7 @@ from __future__ import annotations
 
 from typing import Any, List, TypeVar
 
-from django.db import models
 
-_T = TypeVar("_T", bound=models.Model, covariant=True)
-_Row = TypeVar("_Row", covariant=True)
 _QS = TypeVar("_QS", bound="QuerySetFaker")
 
 
