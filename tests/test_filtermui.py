@@ -1,7 +1,7 @@
 from tests import (
     QuerySetFaker,
-    json_string_two,
     json_string_one,
+    json_string_two,
     json_string_three,
     json_string_four,
     json_string_five,
