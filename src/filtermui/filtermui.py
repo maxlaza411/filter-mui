@@ -2,7 +2,6 @@ from typing import Any, Dict, List
 from django.db.models.query import QuerySet
 from .django_filter_operators import operators
 from .filter_types import QuerySetOperations
-from .channels_database import run_filter, run_exclude
 
 
 from django.db.models import Q
@@ -10,7 +9,7 @@ import json
 import re
 
 
-async def add_mui_filters(
+def add_mui_filters(
     query_set: QuerySet,
     mui_filter_model: str,
     column_field_mappings: Dict[str, str] | None = None,
@@ -37,7 +36,7 @@ async def add_mui_filters(
             else:
                 q_objects |= ~Q(**dict_filter)
 
-        query_set = await run_exclude(query_set, q_objects)
+        query_set = query_set.filter(q_objects)
     else:
         for filter in filters:
             dict_filter, query_set_operation = read_filter(
@@ -47,9 +46,9 @@ async def add_mui_filters(
                 continue
 
             if query_set_operation == QuerySetOperations.FILTER:
-                query_set = await run_filter(query_set, dict_filter)
+                query_set = query_set.filter(**dict_filter)
             else:
-                query_set = await run_exclude(query_set, dict_filter)
+                query_set = query_set.exclude(**dict_filter)
 
     return query_set
 

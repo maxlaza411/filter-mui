@@ -11,7 +11,7 @@ from src.filtermui import add_mui_filters
 import unittest
 
 
-class TestFilterMUI(unittest.IsolatedAsyncioTestCase):
+class TestFilterMUI(unittest.TestCase):
     async def test_example_one(self):
         faker = QuerySetFaker()
         await add_mui_filters(faker, json_string_one, {"MRN": "medical_record_number"})
