@@ -1,16 +1,23 @@
 import unittest
 
 from src.filtermui import add_mui_filters
-from tests import (QuerySetFaker, JSON_STRING_FIVE, JSON_STRING_FOUR,
-                   JSON_STRING_ONE, JSON_STRING_THREE, JSON_STRING_TWO)
+from tests import (
+    QuerySetFaker,
+    JSON_STRING_FIVE,
+    JSON_STRING_FOUR,
+    JSON_STRING_ONE,
+    JSON_STRING_THREE,
+    JSON_STRING_TWO,
+)
 
 
 class TestFilterMUI(unittest.TestCase):
     """
     Test class for filtermui program
     """
+
     def test_example_one(self):
-        """ Test number one """
+        """Test number one"""
         faker = QuerySetFaker()
         add_mui_filters(faker, JSON_STRING_ONE, {"MRN": "medical_record_number"})
         self.assertEqual(
