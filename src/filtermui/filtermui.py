@@ -12,7 +12,7 @@ from .filter_types import QuerySetOperations
 def add_mui_filters(
     query_set: QuerySet,
     mui_filter_model: str,
-    column_field_mappings: Dict[str, str] | None = None,
+    column_field_mappings = None,
 ) -> QuerySet:
     _mui_filter_model: Dict[List, str] = json.loads(mui_filter_model)
     link_operator: str | None = _mui_filter_model.get("linkOperator", None)
@@ -23,6 +23,7 @@ def add_mui_filters(
     # Nicer way to do this?
     if using_or_linker:
         # Lot of slow down with "or"
+        # Lot of repition. Use functiosn to abstract.
         q_objects = Q()
         for filter in filters:
             dict_filter, query_set_operation = read_filter(
@@ -32,9 +33,15 @@ def add_mui_filters(
                 continue
 
             if query_set_operation == QuerySetOperations.FILTER:
-                q_objects |= Q(**dict_filter)
+                if isinstance(dict_filter, Q):
+                    q_objects |= dict_filter
+                else:
+                    q_objects |= Q(**dict_filter)
             else:
-                q_objects |= ~Q(**dict_filter)
+                if isinstance(dict_filter, Q):
+                    q_objects |= ~dict_filter
+                else:
+                    q_objects |= ~Q(**dict_filter)
 
         query_set = query_set.filter(q_objects)
     else:
@@ -46,15 +53,22 @@ def add_mui_filters(
                 continue
 
             if query_set_operation == QuerySetOperations.FILTER:
-                query_set = query_set.filter(**dict_filter)
+                if isinstance(dict_filter, Q):
+                    query_set = query_set.filter(dict_filter)
+                else:
+                    query_set = query_set.filter(**dict_filter)
             else:
-                query_set = query_set.exclude(**dict_filter)
+                if isinstance(dict_filter, Q):
+                    query_set = query_set.exclude(dict_filter)
+                else:
+                    query_set = query_set.exclude(**dict_filter)
 
     return query_set
 
 
 def read_filter(
-    dict_filter: Dict, column_field_mappings: Dict[str, str] | None
+    dict_filter: Dict,
+    column_field_mappings,
 ) -> tuple[dict[str, Any], QuerySetOperations] | tuple[None, QuerySetOperations]:
     column_name: str = dict_filter["columnField"]
     mui_operator: str = dict_filter["operatorValue"]
@@ -63,6 +77,10 @@ def read_filter(
     if column_field_mappings is None or column_name not in column_field_mappings:
         column_name = convert_to_snake_case(column_name)
     else:
+        # Allow function args
+        if callable(column_field_mappings[column_name]):
+            return column_field_mappings[column_name](column_name, mui_operator, value)
+
         column_name = column_field_mappings[column_name]
 
     django_operator, operation_type, possible_val = operators[mui_operator]
