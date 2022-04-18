@@ -12,7 +12,7 @@ from .filter_types import QuerySetOperations
 def add_mui_filters(
     query_set: QuerySet,
     mui_filter_model: str,
-    column_field_mappings = None,
+    column_field_mappings=None,
 ) -> QuerySet:
     _mui_filter_model: Dict[List, str] = json.loads(mui_filter_model)
     link_operator: str | None = _mui_filter_model.get("linkOperator", None)
