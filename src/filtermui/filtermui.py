@@ -2,74 +2,45 @@ import json
 import re
 from typing import Any, Dict, List
 
-from django.db.models import Q
 from django.db.models.query import QuerySet
 
 from .django_filter_operators import operators
 from .filter_types import QuerySetOperations
+from .FilterContainer import FilterContainer
 
 
 def add_mui_filters(
     query_set: QuerySet,
     mui_filter_model: str,
     column_field_mappings=None,
+    conditionally_run: dict[str, callable] | None = None
 ) -> QuerySet:
     _mui_filter_model: Dict[List, str] = json.loads(mui_filter_model)
     link_operator: str | None = _mui_filter_model.get("linkOperator", None)
     filters: List = _mui_filter_model["items"]
 
+    if len(filters) == 0:
+        return query_set
+
     using_or_linker = link_operator == "or" and len(filters) > 1
 
-    # Nicer way to do this?
-    if using_or_linker:
-        # Lot of slow down with "or"
-        # Lot of repition. Use functiosn to abstract.
-        q_objects = Q()
-        for filter in filters:
-            dict_filter, query_set_operation = read_filter(
-                filter, column_field_mappings
-            )
-            if dict_filter is None:
-                continue
+    generated_filters = FilterContainer(query_set, using_or_linker)
+    for filter in filters:
+        generated_filter = read_filter(filter, column_field_mappings, conditionally_run)
+        
+        if not generated_filter[0]:
+            continue
 
-            if query_set_operation == QuerySetOperations.FILTER:
-                if isinstance(dict_filter, Q):
-                    q_objects |= dict_filter
-                else:
-                    q_objects |= Q(**dict_filter)
-            else:
-                if isinstance(dict_filter, Q):
-                    q_objects |= ~dict_filter
-                else:
-                    q_objects |= ~Q(**dict_filter)
+        generated_filters += generated_filter
 
-        query_set = query_set.filter(q_objects)
-    else:
-        for filter in filters:
-            dict_filter, query_set_operation = read_filter(
-                filter, column_field_mappings
-            )
-            if dict_filter is None:
-                continue
-
-            if query_set_operation == QuerySetOperations.FILTER:
-                if isinstance(dict_filter, Q):
-                    query_set = query_set.filter(dict_filter)
-                else:
-                    query_set = query_set.filter(**dict_filter)
-            else:
-                if isinstance(dict_filter, Q):
-                    query_set = query_set.exclude(dict_filter)
-                else:
-                    query_set = query_set.exclude(**dict_filter)
-
-    return query_set
+    return generated_filters
 
 
 def read_filter(
     dict_filter: Dict,
     column_field_mappings,
-) -> tuple[dict[str, Any], QuerySetOperations] | tuple[None, QuerySetOperations]:
+    conditionally_run: dict[str, callable] | None
+) -> tuple[dict[str, Any], QuerySetOperations, bool] | tuple[None, QuerySetOperations, callable | None]:
     column_name: str = dict_filter["columnField"]
     mui_operator: str = dict_filter["operatorValue"]
     value: str = dict_filter.get("value", None)
@@ -85,16 +56,18 @@ def read_filter(
 
     django_operator, operation_type, possible_val = operators[mui_operator]
 
+    cond_run_res = conditionally_run.get(column_name, None)
+
     if possible_val is not None:
         value = possible_val
 
     # If no operation applied
     if value is None or value == "":
-        return None, operation_type
+        return None, operation_type, cond_run_res
 
     dict_key = "{0}__{1}".format(column_name, django_operator)
 
-    return {dict_key: value}, operation_type
+    return {dict_key: value}, operation_type, cond_run_res
 
 
 def convert_to_snake_case(camel_case_field_name: str) -> str:
