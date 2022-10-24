@@ -9,7 +9,7 @@ Submit your MUI filters to your Django backend via a JSON String. Create a query
 # Installation
 
 Run the following:
-Please note that the PIP installation does not currently work. I'm working on correcting this error. Please install the source code.
+READ THIS!!! -> Please note that the PIP installation does not currently work. I'm working on correcting this error. Please install the source code. <- READ THIS!!
 
 ```python
 pip install filtermui
